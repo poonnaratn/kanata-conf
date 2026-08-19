@@ -10,13 +10,13 @@
 
 (defsrc
   caps lmet lsft f23
-  w a s d
+  enter w a s d q e
 )
 
 (defalias
   ;; Tap Caps Lock for Escape; pressing another key makes it Control immediately.
   esc_ctrl (tap-hold-press 200 200 esc lctl)
-  copilot_nav (layer-while-held navigation)
+  enter_nav (tap-hold-press 200 200 ret (layer-while-held navigation))
 )
 
 ;; Treat the firmware-generated Copilot chord as one virtual key.
@@ -29,15 +29,15 @@
   (lmet) lmet
   (lsft) lsft
   (f23) f23
-  (lmet lsft f23) @copilot_nav
+  (lmet lsft f23) lmet
 )
 
 (deflayer base
   @esc_ctrl (chord copilot lmet) (chord copilot lsft) (chord copilot f23)
-  w a s d
+  @enter_nav w a s d q e
 )
 
 (deflayer navigation
   @esc_ctrl (chord copilot lmet) (chord copilot lsft) (chord copilot f23)
-  up left down right
+  @enter_nav up left down right pgup pgdn
 )

@@ -7,15 +7,16 @@ installed at the root of `~/.config`.
 
 - Tap Caps Lock: `Esc`.
 - Hold Caps Lock: left `Ctrl`.
-- Hold the Copilot key: `W`, `A`, `S`, and `D` become Up, Left, Down, and
-  Right Arrow respectively.
+- The Copilot key acts as Left Super.
+- Tap Enter: `Enter`.
+- Hold Enter: `W`, `A`, `S`, and `D` become Up, Left, Down, and Right Arrow;
+  `Q` becomes Page Up and `E` becomes Page Down.
 
 The Copilot key is handled as the chord it actually emits on this keyboard:
 Left Meta + Left Shift + F23.
 
-## Enable after Kanata is installed
+## Enable Kanata
 
-The `kanata` executable was not installed when this configuration was made.
 Kanata 1.12.0 is installed at `/usr/bin/kanata`. Register and start the
 included per-user service:
 
@@ -28,6 +29,12 @@ Check its status with:
 
 ```sh
 systemctl --user status kanata-remapper.service
+```
+
+After changing the configuration, restart the service:
+
+```sh
+systemctl --user restart kanata-remapper.service
 ```
 
 Kanata also needs permission to read the keyboard event device and create its
