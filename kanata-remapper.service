@@ -1,0 +1,14 @@
+[Unit]
+Description=Personal Kanata keyboard remapping
+Documentation=https://github.com/jtroo/kanata
+After=graphical-session-pre.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/kanata --no-wait --nodelay --cfg %h/.config/kanata-remapper/kanata.kbd
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

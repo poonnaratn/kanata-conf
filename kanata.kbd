@@ -1,0 +1,43 @@
+;; Personal Kanata remapping.
+;;
+;; The Copilot key on this keyboard emits Left Meta + Left Shift + F23.
+;; Holding that chord enables the navigation layer. Release it to return
+;; immediately to the base layer.
+
+(defcfg
+  process-unmapped-keys yes
+)
+
+(defsrc
+  caps lmet lsft f23
+  w a s d
+)
+
+(defalias
+  ;; Tap Caps Lock for Escape; pressing another key makes it Control immediately.
+  esc_ctrl (tap-hold-press 200 200 esc lctl)
+  copilot_nav (layer-while-held navigation)
+)
+
+;; Treat the firmware-generated Copilot chord as one virtual key.
+(defchords
+  ;; The Copilot firmware emits its three keys back-to-back. Keep this tiny so
+  ;; ordinary Left Super shortcuts reach Niri before their next key.
+  copilot 1
+  ;; Each chord participant needs its normal one-key behaviour as a fallback.
+  ;; Without these, a plain Left Super is consumed by the chord recognizer.
+  (lmet) lmet
+  (lsft) lsft
+  (f23) f23
+  (lmet lsft f23) @copilot_nav
+)
+
+(deflayer base
+  @esc_ctrl (chord copilot lmet) (chord copilot lsft) (chord copilot f23)
+  w a s d
+)
+
+(deflayer navigation
+  @esc_ctrl (chord copilot lmet) (chord copilot lsft) (chord copilot f23)
+  up left down right
+)
