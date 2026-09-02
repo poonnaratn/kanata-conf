@@ -83,3 +83,6 @@ case "$os" in
     ;;
   *) die "unsupported operating system: $os" ;;
 esac
+
+say "Running post-install verification"
+"$script_dir/verify.sh"

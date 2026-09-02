@@ -26,12 +26,23 @@ For a new Linux or macOS machine, clone this repository and run:
 The script installs Kanata when possible, copies `kanata.kbd` to the standard
 user config directory, and registers it to start at login. On Linux it creates
 a systemd user service; on macOS it creates a LaunchAgent. Re-run the script
-after changing the configuration.
+after changing the configuration. Setup automatically runs `verify.sh` and
+returns a failure status if a required check does not pass.
 
 On macOS, approve Kanata under System Settings → Privacy & Security → Input
 Monitoring and Accessibility. On Linux, Kanata needs access to the keyboard
 event devices and `/dev/uinput`; your distribution may require an additional
 udev rule or group membership.
+
+Verify an installation without changing anything:
+
+```sh
+./verify.sh
+```
+
+The verifier checks the config syntax, Kanata version, Linux virtual-keyboard
+access, and whether the Linux service or macOS LaunchAgent is enabled and
+running. It exits with status 1 if a required check fails.
 
 ### Manual Linux setup
 
