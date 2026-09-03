@@ -7,6 +7,7 @@ config_file=$config_dir/kanata.kbd
 
 say() { printf 'kanata setup: %s\n' "$*" >&2; }
 die() { printf 'kanata setup: error: %s\n' "$*" >&2; exit 1; }
+needs_new_login=0
 
 find_kanata() {
   command -v kanata 2>/dev/null || true
@@ -36,6 +37,31 @@ install_kanata() {
   printf '%s\n' "$found"
 }
 
+configure_linux_permissions() {
+  if id -nG | tr ' ' '\n' | grep -qx input && [ -r /dev/uinput ] && [ -w /dev/uinput ]; then
+    return
+  fi
+
+  command -v sudo >/dev/null 2>&1 || die "sudo is required once to configure Kanata device access"
+
+  say "Administrator permission is required once to configure keyboard-device access"
+  sudo -v || die "administrator authorization is required to configure Kanata device access"
+  sudo groupadd --force input
+  printf '%s\n' \
+    '# Allow members of input to use Kanata virtual and physical keyboards.' \
+    'KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"' \
+    'SUBSYSTEM=="input", KERNEL=="event[0-9]*", MODE="0660", GROUP="input"' \
+    | sudo tee /etc/udev/rules.d/99-kanata.rules >/dev/null
+  sudo udevadm control --reload-rules
+  sudo modprobe uinput
+  sudo udevadm trigger --subsystem-match=input
+
+  if ! id -nG | tr ' ' '\n' | grep -qx input; then
+    sudo usermod --append --groups input "$(id -un)"
+    needs_new_login=1
+  fi
+}
+
 os=$(uname -s)
 kanata_bin=$(install_kanata "$os")
 
@@ -47,6 +73,7 @@ say "Installed config at $config_file"
 case "$os" in
   Linux)
     command -v systemctl >/dev/null 2>&1 || die "systemd is required for automatic startup on Linux"
+    configure_linux_permissions
     service_dir=$HOME/.config/systemd/user
     service_file=$service_dir/kanata-remapper.service
     mkdir -p "$service_dir"
@@ -85,4 +112,9 @@ case "$os" in
 esac
 
 say "Running post-install verification"
-"$script_dir/verify.sh"
+if [ "$needs_new_login" -eq 1 ]; then
+  say "Your user was added to the input group. Log out and back in (or reboot); Kanata will then start automatically."
+  say "After logging back in, run ./verify.sh"
+else
+  "$script_dir/verify.sh"
+fi

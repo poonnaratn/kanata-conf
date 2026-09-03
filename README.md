@@ -24,10 +24,13 @@ For a new Linux or macOS machine, clone this repository and run:
 ```
 
 The script installs Kanata when possible, copies `kanata.kbd` to the standard
-user config directory, and registers it to start at login. On Linux it creates
-a systemd user service; on macOS it creates a LaunchAgent. Re-run the script
-after changing the configuration. Setup automatically runs `verify.sh` and
-returns a failure status if a required check does not pass.
+user config directory, and registers it to start at login. On Linux it asks for
+your password once to install a udev rule and add your user to the `input`
+group, then creates a systemd user service; on macOS it creates a LaunchAgent.
+After a first Linux installation, log out and back in (or reboot) so the new
+group membership takes effect. Re-run the script after changing the
+configuration. Setup automatically runs `verify.sh` and returns a failure
+status if a required check does not pass.
 
 On macOS, approve Kanata under System Settings → Privacy & Security → Input
 Monitoring and Accessibility. On Linux, Kanata needs access to the keyboard
@@ -46,11 +49,9 @@ running. It exits with status 1 if a required check fails.
 
 ### Manual Linux setup
 
-Kanata 1.12.0 is installed at `/usr/bin/kanata`. Register and start the
-included per-user service:
+After logging back in following the first setup, manage the per-user service:
 
 ```sh
-systemctl --user link ~/.config/kanata-remapper/kanata-remapper.service
 systemctl --user enable --now kanata-remapper.service
 ```
 
